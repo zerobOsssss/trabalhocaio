@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Igrejas Históricas - Teste seus Conhecimentos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        /* Reset e Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Container Principal */
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Cabeçalho */
+        .quiz-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .quiz-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .quiz-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .quiz-counter {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Conteúdo do Quiz */
+        .quiz-content {
+            padding: 40px;
+        }
+
+        .question-image {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .question-image img {
+            width: 100%;
+            max-width: 350px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .question-text {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 35px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .option-btn {
+            background: #f8f9fa;
+            border: 3px solid #e9ecef;
+            padding: 18px 25px;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .option-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .option-btn.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .option-btn.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        /* Navegação */
+        .quiz-navigation {
+            text-align: center;
+            padding: 0 40px 40px;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .next-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .next-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Resultados */
+        .quiz-results {
+            display: none;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .results-title {
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 35px;
+        }
+
+        .score-percentage {
+            font-size: 60px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .score-details {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        /* Revisão das Respostas */
+        .answers-review {
+            text-align: left;
+            margin-bottom: 35px;
+        }
+
+        .review-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #333;
+        }
+
+        .answer-review-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #e9ecef;
+        }
+
+        .answer-review-item.correct {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+
+        .answer-review-item.incorrect {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .review-question {
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .review-answer {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .user-answer.correct {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .user-answer.incorrect {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .correct-answer {
+            color: #28a745;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        /* Botões de Ação */
+        .results-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .restart-btn, .close-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .close-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .restart-btn:hover, .close-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .quiz-container {
+                margin: 0;
+            }
+            
+            .quiz-content, .quiz-results {
+                padding: 25px;
+            }
+            
+            .quiz-header {
+                padding: 25px;
+            }
+            
+            .quiz-title {
+                font-size: 24px;
+            }
+            
+            .question-text {
+                font-size: 20px;
+            }
+            
+            .option-btn {
+                padding: 15px 20px;
+                font-size: 16px;
+            }
+            
+            .score-percentage {
+                font-size: 48px;
+            }
+            
+            .results-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .restart-btn, .close-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+
+            .quiz-counter {
+                position: static;
+                margin-top: 15px;
+                display: inline-block;
+            }
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quiz-content, .quiz-results {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1 class="quiz-title">Quiz: Igrejas Históricas</h1>
+            <p class="quiz-subtitle">Teste seus conhecimentos sobre nosso patrimônio cultural</p>
+            <div class="quiz-counter">
+                <span id="currentQuestion">1</span> de <span id="totalQuestions">5</span>
+            </div>
+        </div>
+        
+        <div class="quiz-content">
+            <div class="question-image">
+                <img id="questionImage" src="" alt="Igreja Histórica" />
+            </div>
+            
+            <h2 id="questionText" class="question-text">Qual nome desta igreja?</h2>
+            
+            <div class="quiz-options">
+                <button class="option-btn" data-option="0"></button>
+                <button class="option-btn" data-option="1"></button>
+                <button class="option-btn" data-option="2"></button>
+                <button class="option-btn" data-option="3"></button>
+            </div>
+        </div>
+        
+        <div class="quiz-navigation">
+            <button id="nextBtn" class="next-btn" disabled>Próxima</button>
+        </div>
+        
+        <!-- Tela de Resultados -->
+        <div class="quiz-results">
+            <h2 class="results-title">Resultado do Quiz</h2>
+            
+            <div class="score-display">
+                <span id="scorePercentage" class="score-percentage">0%</span>
+                <div class="score-details">
+                    Você acertou <span id="correctAnswers">0</span> de <span id="totalQuestionsResult">5</span> perguntas!
+                </div>
+            </div>
+            
+            <div class="answers-review">
+                <h3 class="review-title">Revisão das Respostas</h3>
+                <div id="answersReview"></div>
+            </div>
+            
+            <div class="results-actions">
+                <button id="restartQuiz" class="restart-btn">Tentar Novamente</button>
+                <button id="closeQuiz" class="close-btn">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // QUIZ INTERATIVO - IGREJAS HISTÓRICAS
+        // ========================================
+
+        // Dados do Quiz
+        const quizData = [
+            {
+                image: "alto-da-se.png",
+                question: "Qual nome desta igreja?",
+                options: ["Igreja alto da se", "Igreja sao francisco", "Igreja do carmo", "Igreja mosteiro sao bento"],
+                correct: 0
+            },
+            {
+                image: "sao-francisco.png", 
+                question: "Qual nome desta igreja?",
+                options: ["Igreja sao francisco", "Igreja do carmo", "Igreja mosteiro sao bento", "Igreja alto da se"],
+                correct: 0
+            },
+            {
+                image: "monteiro-sao-bento.png",
+                question: "Qual nome desta Igreja?",
+                options: ["Igreja alto da se", "Igreja sao francisco", "Igreja do carmo", "Igreja mosteiro sao bento"],
+                correct: 3
+            },
+            {
+                image: "carmo.png",
+                question: "Qual nome desta igreja?",
+                options: ["Igreja alto da se", "Igreja mosteiro sao bento", "Igreja do carmo", "Igreja sao francisco"],
+                correct: 2
+            },
+            {
+                question: "Qual igreja e a catedral?",
+                options: ["Igreja da se", "Igreja sao francisco", "igreja do carmo"],
+                correct: 0,
+                noImage: true
+            }
+        ];
+
+        // Variáveis do Quiz
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let score = 0;
+
+        // Elementos DOM
+        const questionImage = document.getElementById('questionImage');
+        const questionText = document.getElementById('questionText');
+        const optionBtns = document.querySelectorAll('.option-btn');
+        const nextBtn = document.getElementById('nextBtn');
+        const currentQuestionSpan = document.getElementById('currentQuestion');
+        const totalQuestionsSpan = document.getElementById('totalQuestions');
+        const quizContent = document.querySelector('.quiz-content');
+        const quizResults = document.querySelector('.quiz-results');
+        const scorePercentage = document.getElementById('scorePercentage');
+        const correctAnswersSpan = document.getElementById('correctAnswers');
+        const totalQuestionsResult = document.getElementById('totalQuestionsResult');
+        const answersReview = document.getElementById('answersReview');
+        const restartQuizBtn = document.getElementById('restartQuiz');
+        const closeQuizBtn = document.getElementById('closeQuiz');
+
+        // Inicializar Quiz
+        function initQuiz() {
+            console.log('🎯 Inicializando Quiz...');
+            
+            // Event Listeners
+            nextBtn?.addEventListener('click', nextQuestion);
+            restartQuizBtn?.addEventListener('click', restartQuiz);
+            closeQuizBtn?.addEventListener('click', closeQuiz);
+            
+            // Event listeners para opções
+            optionBtns.forEach((btn, index) => {
+                btn.addEventListener('click', () => selectOption(index));
+            });
+            
+            // Definir total de questões
+            if (totalQuestionsSpan) {
+                totalQuestionsSpan.textContent = quizData.length;
+            }
+            if (totalQuestionsResult) {
+                totalQuestionsResult.textContent = quizData.length;
+            }
+
+            // Carregar primeira questão
+            loadQuestion();
+        }
+
+        // Resetar Quiz
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            score = 0;
+            quizContent.style.display = 'block';
+            quizResults.style.display = 'none';
+            nextBtn.disabled = true;
+            
+            // Limpar seleções
+            optionBtns.forEach(btn => {
+                btn.classList.remove('selected', 'correct', 'incorrect');
+            });
+        }
+
+        // Carregar Questão
+        function loadQuestion() {
+            const question = quizData[currentQuestionIndex];
+            
+            // Atualizar contador
+            currentQuestionSpan.textContent = currentQuestionIndex + 1;
+            
+            // Atualizar imagem
+            if (question.noImage) {
+                questionImage.style.display = 'none';
+            } else {
+                questionImage.style.display = 'block';
+                questionImage.src = question.image;
+                questionImage.alt = `Questão ${currentQuestionIndex + 1}`;
+            }
+            
+            // Atualizar texto da questão
+            questionText.innerHTML = question.question;
+            
+            // Atualizar opções
+            optionBtns.forEach((btn, index) => {
+                if (index < question.options.length) {
+                    btn.style.display = 'block';
+                    btn.textContent = question.options[index];
+                    btn.classList.remove('selected', 'correct', 'incorrect');
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+            
+            // Resetar botão próxima
+            nextBtn.disabled = true;
+            nextBtn.textContent = currentQuestionIndex === quizData.length - 1 ? 'Ver Resultado' : 'Próxima';
+        }
+
+        // Selecionar Opção
+        function selectOption(selectedIndex) {
+            const question = quizData[currentQuestionIndex];
+            
+            // Remover seleção anterior
+            optionBtns.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Marcar opção selecionada
+            optionBtns[selectedIndex].classList.add('selected');
+            
+            // Salvar resposta
+            userAnswers[currentQuestionIndex] = selectedIndex;
+            
+            // Habilitar botão próxima
+            nextBtn.disabled = false;
+            
+            console.log(`Resposta selecionada: ${selectedIndex}, Correta: ${question.correct}`);
+        }
+
+        // Próxima Questão
+        function nextQuestion() {
+            const question = quizData[currentQuestionIndex];
+            const userAnswer = userAnswers[currentQuestionIndex];
+            
+            // Verificar se acertou
+            if (userAnswer === question.correct) {
+                score++;
+            }
+            
+            // Próxima questão ou mostrar resultados
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // Mostrar Resultados
+        function showResults() {
+            console.log(`🎉 Quiz finalizado! Pontuação: ${score}/${quizData.length}`);
+            
+            // Esconder conteúdo do quiz
+            quizContent.style.display = 'none';
+            document.querySelector('.quiz-navigation').style.display = 'none';
+            quizResults.style.display = 'block';
+            
+            // Calcular porcentagem
+            const percentage = Math.round((score / quizData.length) * 100);
+            
+            // Atualizar elementos de resultado
+            scorePercentage.textContent = `${percentage}%`;
+            correctAnswersSpan.textContent = score;
+            
+            // Gerar revisão das respostas
+            generateAnswersReview();
+        }
+
+        // Gerar Revisão das Respostas
+        function generateAnswersReview() {
+            answersReview.innerHTML = '';
+            
+            quizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === question.correct;
+                
+                const reviewItem = document.createElement('div');
+                reviewItem.className = `answer-review-item ${isCorrect ? 'correct' : 'incorrect'}`;
+                
+                reviewItem.innerHTML = `
+                    <div class="review-question">
+                        <strong>Questão ${index + 1}:</strong> ${question.question}
+                    </div>
+                    <div class="review-answer">
+                        <span class="user-answer ${isCorrect ? 'correct' : 'incorrect'}">
+                            Sua resposta: ${question.options[userAnswer] || 'Não respondida'}
+                        </span>
+                        ${!isCorrect ? `<span class="correct-answer">Resposta correta: ${question.options[question.correct]}</span>` : ''}
+                    </div>
+                `;
+                
+                answersReview.appendChild(reviewItem);
+            });
+        }
+
+        // Reiniciar Quiz
+        function restartQuiz() {
+            console.log('🔄 Reiniciando Quiz...');
+            resetQuiz();
+            document.querySelector('.quiz-navigation').style.display = 'block';
+            loadQuestion();
+        }
+
+        // Fechar Quiz
+        function closeQuiz() {
+            console.log('❌ Fechando Quiz...');
+            window.close();
+        }
+
+        // Inicializar quando DOM carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            initQuiz();
+        });
+
+        console.log('🎨 Quiz de Igrejas Históricas carregado com sucesso!');
+    </script>
+</body>
+</html>
